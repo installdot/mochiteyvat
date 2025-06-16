@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - John Doe</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #1c2526;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* Background Effects */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .gradient-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 183, 235, 0.15), rgba(28, 37, 38, 0.85), rgba(0, 183, 235, 0.15));
+            opacity: 0.4;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 20px,
+                rgba(0, 183, 235, 0.05) 20px,
+                rgba(0, 183, 235, 0.05) 21px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 20px,
+                rgba(0, 183, 235, 0.05) 20px,
+                rgba(0, 183, 235, 0.05) 21px
+            );
+            opacity: 0.3;
+        }
+
+        .morph-shape {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* User Card */
+        .user-card {
+            background: #2a3434;
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 20px rgba(0, 183, 235, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(45deg, #00b7eb, #0099cc, #1c2526);
+            z-index: -1;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 183, 235, 0.4), transparent);
+            transition: transform 1.2s;
+        }
+
+        .user-card:hover .banner-overlay {
+            transform: translateX(100%);
+        }
+
+        .user-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #00b7eb;
+            box-shadow: 0 0 15px rgba(0, 183, 235, 0.5);
+            transition: transform 0.4s, box-shadow 0.4s;
+        }
+
+        .user-card img:hover {
+            transform: scale(1.2) rotate(8deg);
+            box-shadow: 0 0 25px rgba(0, 183, 235, 0.8);
+        }
+
+        .user-info h1 {
+            font-size: 2.2rem;
+            color: #00b7eb;
+            text-shadow: 0 0 10px rgba(0, 183, 235, 0.4);
+        }
+
+        .user-info p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .tab-button {
+            padding: 0.8rem 1.5rem;
+            background: #2a3434;
+            color: #b0b0b0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s, transform 0.3s;
+        }
+
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 183, 235, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .tab-button:hover::before, .tab-button.active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .tab-button:hover, .tab-button.active {
+            background: #00b7eb;
+            color: #1c2526;
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px rgba(0, 183, 235, 0.6);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            background: #2a3434;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h2 {
+            font-size: 2rem;
+            color: #00b7eb;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px rgba(0, 183, 235, 0.3);
+        }
+
+        .about-content p, .roles-content p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #b0b0b0;
+        }
+
+        .roles-content p {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-icon {
+            width: 20px;
+            height: 20px;
+            background: #00b7eb;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .connections-info, .donate-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .connection-item, .donate-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .connection-icon, .donate-icon {
+            width: 24px;
+            height: 24px;
+            background: #00b7eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1c2526;
+            font-size: 0.9rem;
+        }
+
+        .connections-info p, .donate-info p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+        }
+
+        .connections-info a {
+            color: #00b7eb;
+            text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        .connections-info a:hover {
+            color: #0099cc;
+            text-shadow: 0 0 10px rgba(0, 183, 235, 0.7);
+        }
+
+        .donate-info span {
+            color: #00b7eb;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .user-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-card img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <div class="gradient-overlay"></div>
+        <div class="grid-overlay"></div>
+        <svg class="morph-shape" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0,0 C30,10 70,10 100,0 L100,100 L0,100 Z" fill="rgba(0, 183, 235, 0.2)" />
+        </svg>
+    </div>
+
+    <main class="main-content">
+        <div class="user-card animate-card">
+            <div class="banner">
+                <div class="banner-overlay"></div>
+            </div>
+            <img src="https://placehold.co/120x120?text=Avatar" alt="Avatar">
+            <div class="user-info">
+                <h1 class="animate-text">John Doe#1234</h1>
+                <p class="animate-text">Web Developer | Animation Enthusiast | UI/UX Innovator</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button animate-tab active" data-tab="about-me">About Me</button>
+            <button class="tab-button animate-tab" data-tab="roles">Roles</button>
+            <button class="tab-button animate-tab" data-tab="connections">Connections</button>
+            <button class="tab-button animate-tab" data-tab="donate">Donate</button>
+        </div>
+
+        <div id="about-me" class="tab-content active animate-content">
+            <h2 class="animate-title">About Me</h2>
+            <div class="about-content">
+                <p class="animate-text">I'm a web developer with over 5 years of experience, specializing in JavaScript, React, and advanced animation techniques. My passion lies in crafting immersive, visually stunning web experiences that captivate users and elevate brands. I thrive on solving complex UI challenges and integrating seamless animations to enhance user engagement. In my spare time, I explore new frameworks, contribute to open-source projects, and experiment with creative coding to push the boundaries of web design. Let's collaborate to build something extraordinary!</p>
+            </div>
+        </div>
+
+        <div id="roles" class="tab-content animate-content">
+            <h2 class="animate-title">Roles</h2>
+            <div class="roles-content">
+                <p class="animate-text"><span class="role-icon"></span> Frontend Developer: Building responsive, high-performance user interfaces using React, TypeScript, and modern JavaScript. Experienced in optimizing web applications for speed and accessibility.</p>
+                <p class="animate-text"><span class="role-icon"></span> Animation Specialist: Designing fluid, interactive animations with Anime.js, GSAP, and CSS. Skilled in creating micro-interactions that enhance user experience and brand identity.</p>
+                <p class="animate-text"><span class="role-icon"></span> UI/UX Enthusiast: Crafting intuitive, user-centered designs with Figma and Adobe XD. Focused on creating visually appealing layouts that prioritize usability and engagement.</p>
+            </div>
+        </div>
+
+        <div id="connections" class="tab-content animate-content">
+            <h2 class="animate-title">Connections</h2>
+            <div class="connections-info">
+                <div class="connection-item animate-contact">
+                    <span class="connection-icon">Z</span>
+                    <p>Zalo: <a href="tel:+84343280438">0343280438</a></p>
+                </div>
+                <div class="connection-item animate-contact">
+                    <span class="connection-icon">M</span>
+                    <p>Messenger/Facebook: <a href="https://m.me/mochiteyvat" target="_blank">m.me/mochiteyvat</a></p>
+                </div>
+                <div class="connection-item animate-contact">
+                    <span class="connection-icon">T</span>
+                    <p>Telegram: <a href="https://t.me/mochiteyvat" target="_blank">t.me/mochiteyvat</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="donate" class="tab-content animate-content">
+            <h2 class="animate-title">Donate</h2>
+            <div class="donate-info">
+                <div class="donate-item animate-donate">
+                    <span class="donate-icon">MB</span>
+                    <p>MBBank: <span>89998999999899</span></p>
+                </div>
+                <div class="donate-item animate-donate">
+                    <span class="donate-icon">MM</span>
+                    <p>Momo: <span>0343280438</span></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Optimize by running animations after page load
+        window.addEventListener('load', () => {
+            // Gradient Overlay Animation
+            anime({
+                targets: '.gradient-overlay',
+                opacity: [0.4, 0.6, 0.4],
+                duration: 7000,
+                easing: 'easeInOutSine',
+                loop: true,
+            });
+
+            // Grid Overlay Pulse
+            anime({
+                targets: '.grid-overlay',
+                opacity: [0.3, 0.5, 0.3],
+                duration: 5000,
+                easing: 'easeInOutSine',
+                loop: true,
+            });
+
+            // Morphing Background Shape (Reduced Keyframes)
+            anime({
+                targets: '.morph-shape path',
+                d: [
+                    'M0,0 C30,10 70,10 100,0 L100,100 L0,100 Z',
+                    'M0,0 C20,30 80,20 100,0 L100,100 L0,100 Z',
+                ],
+                duration: 6000,
+                easing: 'easeInOutSine',
+                loop: true,
+            });
+
+            // Banner Animation
+            anime({
+                targets: '.banner',
+                background: [
+                    'linear-gradient(45deg, #00b7eb, #0099cc, #1c2526)',
+                    'linear-gradient(45deg, #0099cc, #1c2526, #00b7eb)',
+                ],
+                duration: 6000,
+                easing: 'easeInOutSine',
+                loop: true,
+            });
+
+            // User Card Animation
+            anime({
+                targets: '.animate-card',
+                translateY: [150, 0],
+                opacity: [0, 1],
+                scale: [0.9, 1],
+                duration: 1500,
+                easing: 'easeOutExpo',
+            });
+
+            // Letter Animation for User Card Title
+            const userTitle = document.querySelector('.user-info h1');
+            userTitle.innerHTML = userTitle.textContent.replace(/\S/g, '<span class="letter">$&</span>');
+            anime({
+                targets: '.user-info .letter',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 1000,
+                delay: anime.stagger(60),
+                easing: 'easeOutElastic',
+            });
+
+            anime({
+                targets: '.user-info .animate-text',
+                translateX: [80, 0],
+                opacity: [0, 1],
+                duration: 1200,
+                delay: anime.stagger(300),
+                easing: 'easeOutExpo',
+            });
+
+            // Tab Button Animation
+            anime({
+                targets: '.animate-tab',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                scale: [0.8, 1],
+                duration: 1200,
+                delay: anime.stagger(200),
+                easing: 'easeOutElastic',
+            });
+
+            // Tab Content Animation
+            function animateTabContent(tabId) {
+                anime({
+                    targets: `#${tabId} .animate-title`,
+                    translateY: [100, 0],
+                    opacity: [0, 1],
+                    scale: [0.9, 1],
+                    duration: 1200,
+                    easing: 'easeOutBounce',
+                });
+
+                const title = document.querySelector(`#${tabId} .animate-title`);
+                title.innerHTML = title.textContent.replace(/\S/g, '<span class="letter">$&</span>');
+                anime({
+                    targets: `#${tabId} .letter`,
+                    translateY: [30, 0],
+                    opacity: [0, 1],
+                    duration: 1000,
+                    delay: anime.stagger(50),
+                    easing: 'easeOutExpo',
+                });
+
+                anime({
+                    targets: `#${tabId} .animate-text, #${tabId} .animate-contact, #${tabId} .animate-donate`,
+                    translateX: (el, i) => [(i % 2 === 0 ? -200 : 200), 0],
+                    opacity: [0, 1],
+                    scale: [0.8, 1],
+                    duration: 1400,
+                    delay: anime.stagger(300),
+                    easing: 'easeOutElastic',
+                });
+
+                anime({
+                    targets: `#${tabId} .role-icon, #${tabId} .connection-icon, #${tabId} .donate-icon`,
+                    scale: [0, 1.2, 1],
+                    opacity: [0, 1],
+                    rotate: [10, 0],
+                    duration: 1000,
+                    delay: anime.stagger(200),
+                    easing: 'easeOutElastic',
+                });
+            }
+
+            // Tab Switching Logic (Reload Animations)
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            function switchTab(tabId) {
+                tabButtons.forEach(button => button.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                const activeButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+                activeButton.classList.add('active');
+                document.querySelector(`#${tabId}`).classList.add('active');
+
+                // Always animate content on tab switch
+                animateTabContent(tabId);
+
+                anime({
+                    targets: `#${tabId}`,
+                    opacity: [0, 1],
+                    translateY: [40, 0],
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                });
+
+                // Update glow pulse for active tab only
+                anime({
+                    targets: '.tab-button.active',
+                    boxShadow: [
+                        '0 0 10px rgba(0, 183, 235, 0.5)',
+                        '0 0 20px rgba(0, 183, 235, 0.9)',
+                        '0 0 10px rgba(0, 183, 235, 0.5)',
+                    ],
+                    duration: 3000,
+                    easing: 'easeInOutSine',
+                    loop: true,
+                });
+
+                // Remove glow from inactive tabs
+                anime({
+                    targets: '.tab-button:not(.active)',
+                    boxShadow: ['0 0 0 rgba(0, 183, 235, 0)'],
+                    duration: 500,
+                    easing: 'easeOutExpo',
+                });
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // Initial Animation for Default Tab
+            animateTabContent('about-me');
+
+            // User Card Glow Pulse
+            anime({
+                targets: '.user-card',
+                boxShadow: [
+                    '0 0 15px rgba(0, 183, 235, 0.5)',
+                    '0 0 25px rgba(0, 183, 235, 0.9)',
+                    '0 0 15px rgba(0, 183, 235, 0.5)',
+                ],
+                duration: 3500,
+                easing: 'easeInOutSine',
+                loop: true,
+            });
+
+            // Hover Animation for Links and Buttons
+            const interactiveElements = document.querySelectorAll('.tab-button, .connections-info a');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    anime({
+                        targets: el,
+                        scale: [1, 1.1],
+                        color: ['#b0b0b0', '#0099cc'],
+                        duration: 400,
+                        easing: 'easeOutExpo',
+                    });
+                });
+                el.addEventListener('mouseleave', () => {
+                    anime({
+                        targets: el,
+                        scale: [1.1, 1],
+                        color: ['#0099cc', el.classList.contains('tab-button') && el.classList.contains('active') ? '#1c2526' : '#b0b0b0'],
+                        duration: 400,
+                        easing: 'easeOutExpo',
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
